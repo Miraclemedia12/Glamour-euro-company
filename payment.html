@@ -101,6 +101,9 @@
         }
 
         .glamour-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        
+        /* Shimmer effect while loading from DB */
+        .loading { opacity: 0.3; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -110,7 +113,7 @@
     <span class="text-xs font-bold tracking-widest uppercase">Copied to Clipboard</span>
 </div>
 
-<div class="premium-card">
+<div class="premium-card" id="main-card">
     <div class="text-center">
         <h1 class="text-xs font-black text-[#d4af37] tracking-[0.4em] uppercase mb-4">Glamour Ecosystem</h1>
         <div class="timer-badge">
@@ -119,13 +122,13 @@
         </div>
         <h2 class="text-2xl font-black mt-8 mb-2 uppercase italic tracking-tight">Secure Activation</h2>
         <p class="text-white/40 text-[11px] leading-relaxed px-6">
-            Make a transfer of exactly <span class="text-white font-bold">₦14,000</span> to the verified company account below.
+            Make a transfer of exactly <span id="display-amt-small" class="text-white font-bold">₦14,000</span> to the verified company account below.
         </p>
     </div>
 
     <div class="amount-box">
         <span class="text-[10px] text-white/40 uppercase font-black tracking-widest block mb-1">Total Payable</span>
-        <div class="text-3xl font-black">₦14,000</div>
+        <div id="display-amt-large" class="text-3xl font-black">₦14,000</div>
     </div>
 
     <div class="bank-details-wrapper text-center" onclick="copyAccountNumber()">
@@ -135,39 +138,84 @@
         
         <div class="mb-4">
             <p class="text-[9px] text-white/30 uppercase font-black mb-1">Bank Name</p>
-            <p class="text-lg font-bold">KUDA MFB</p>
+            <p id="display-bank" class="text-lg font-bold">---</p>
         </div>
 
         <div class="mb-4">
             <p class="text-[9px] text-white/30 uppercase font-black mb-1">Account Number</p>
-            <p id="acc-num" class="account-number-text">3003773218</p>
+            <p id="acc-num" class="account-number-text">----------</p>
             <span class="text-[8px] bg-white/10 text-white/50 px-3 py-1 rounded-full font-black uppercase">Tap to copy</span>
         </div>
 
         <div>
             <p class="text-[9px] text-white/30 uppercase font-black mb-1">Account Name</p>
-            <p class="text-[12px] font-bold uppercase text-white/80 tracking-wide">
-                Miracle Media Entertainment - Glamour company
+            <p id="display-holder" class="text-[12px] font-bold uppercase text-white/80 tracking-wide">
+                ---
             </p>
         </div>
     </div>
 
     <button onclick="redirectToTelegram()" class="btn-main">
-        I've Sent the ₦14,000 <i class="fas fa-chevron-right text-xs"></i>
+        I've Sent the Payment <i class="fas fa-chevron-right text-xs"></i>
     </button>
 </div>
 
-<script>
-    // 1. DYNAMIC DATA CAPTURE
-    const urlParams = new URLSearchParams(window.location.search);
-    const userData = {
-        name: urlParams.get('name') || "Customer",
-        email: urlParams.get('email') || "Not provided",
-        phone: urlParams.get('phone') || "Not provided",
-        username: urlParams.get('username') || "Not provided"
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAFZYiKkkXjMWs1cGKyeb8j9fS0agk1WEg",
+        authDomain: "tkerry-df1a5.firebaseapp.com",
+        projectId: "tkerry-df1a5",
+        storageBucket: "tkerry-df1a5.firebasestorage.app",
+        messagingSenderId: "174040773129",
+        appId: "1:174040773129:web:d33b3f7502ab6f47003ed8",
+        measurementId: "G-S5Y7DRC04N"
     };
 
-    // 2. TIMER LOGIC
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // LIVE SYNC FROM FIREBASE
+    let activeBankData = { bank: "KUDA MFB", num: "3003773218", name: "Miracle Media Ent.", amt: "₦14,000" };
+
+    const unsub = onSnapshot(doc(db, "configs", "main"), (doc) => {
+        if (doc.exists()) {
+            const data = doc.data().nigeria;
+            activeBankData = data;
+            
+            // Update UI
+            document.getElementById('display-bank').innerText = data.bank;
+            document.getElementById('acc-num').innerText = data.num;
+            document.getElementById('display-holder').innerText = data.name;
+            document.getElementById('display-amt-small').innerText = data.amt;
+            document.getElementById('display-amt-large').innerText = data.amt;
+            
+            document.getElementById('main-card').classList.remove('loading');
+        }
+    });
+
+    // Handle Telegram with latest DB data
+    window.redirectToTelegram = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name') || "Customer";
+        const user = urlParams.get('username') || "---";
+
+        const message = encodeURIComponent(
+            `👑 *NEW GLAMOUR ACTIVATION ALERT*\n\n` +
+            `👤 *Name:* ${name}\n` +
+            `🆔 *Username:* ${user}\n` +
+            `💰 *Paid:* ${activeBankData.amt}\n` +
+            `🏦 *Sent to:* ${activeBankData.bank} (${activeBankData.num})\n\n` +
+            `Please verify my payment.`
+        );
+        window.location.href = `https://t.me/Glamourerouagent?text=${message}`;
+    }
+</script>
+
+<script>
+    // TIMER LOGIC
     function startTimer(duration, display) {
         let timer = duration, minutes, seconds;
         setInterval(function () {
@@ -182,9 +230,9 @@
 
     window.onload = function () {
         startTimer(60 * 10, document.querySelector('#timer'));
+        document.getElementById('main-card').classList.add('loading');
     };
 
-    // 3. COPY FUNCTION
     function copyAccountNumber() {
         const num = document.getElementById('acc-num').innerText;
         navigator.clipboard.writeText(num).then(() => {
@@ -192,22 +240,6 @@
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2500);
         });
-    }
-
-    // 4. TELEGRAM REDIRECT WITH USER DETAILS
-    function redirectToTelegram() {
-        const message = encodeURIComponent(
-            `👑 *NEW GLAMOUR ACTIVATION ALERT*\n\n` +
-            `👤 *Name:* ${userData.name}\n` +
-            `🆔 *Username:* ${userData.username}\n` +
-            `📧 *Email:* ${userData.email}\n` +
-            `📞 *Phone:* ${userData.phone}\n\n` +
-            `💰 *Payment Status:* SENT (₦14,000)\n` +
-            `🏦 *Target Bank:* KUDA MFB\n\n` +
-            `Please verify my receipt and activate my account.`
-        );
-
-        window.location.href = `https://t.me/Glamourerouagent?text=${message}`;
     }
 </script>
 

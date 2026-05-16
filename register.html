@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,8 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-    <script src="https://js.paystack.co/v1/inline.js"></script>
 
     <style>
         :root {
@@ -189,23 +187,22 @@
                     <select id="reg-location" required style="color: gray;" onchange="this.style.color='white'">
                         <option value="" disabled selected>Choose your location</option>
                         <option value="Nigeria">Nigeria</option>
-                            <option value="Ghana">Ghana</option>
-                            <option value="South Africa">South Africa</option>
-                            <option value="Kenya">Kenya</option>
-                            <option value="Egypt">Egypt</option>
-                            <option value="Ethiopia">Ethiopia</option>
-                            <option value="Tanzania">Tanzania</option>
-                            <option value="Uganda">Uganda</option>
-                            <option value="Algeria">Algeria</option>
-                            <option value="Morocco">Morocco</option>
-                            <option value="Angola">Angola</option>
-                            <option value="Ivory Coast">Ivory Coast</option>
-                            <option value="Cameroon">Cameroon</option>
-                            <option value="Senegal">Senegal</option>
-                            <option value="Zimbabwe">Zimbabwe</option>
-                            <option value="Zambia">Zambia</option>
-                            <option value="Other Africa">Other African Country</option>
-                        </optgroup>
+                        <option value="Ghana">Ghana</option>
+                        <option value="South Africa">South Africa</option>
+                        <option value="Kenya">Kenya</option>
+                        <option value="Egypt">Egypt</option>
+                        <option value="Ethiopia">Ethiopia</option>
+                        <option value="Tanzania">Tanzania</option>
+                        <option value="Uganda">Uganda</option>
+                        <option value="Algeria">Algeria</option>
+                        <option value="Morocco">Morocco</option>
+                        <option value="Angola">Angola</option>
+                        <option value="Ivory Coast">Ivory Coast</option>
+                        <option value="Cameroon">Cameroon</option>
+                        <option value="Senegal">Senegal</option>
+                        <option value="Zimbabwe">Zimbabwe</option>
+                        <option value="Zambia">Zambia</option>
+                        <option value="Other Africa">Other African Country</option>
                         <optgroup label="Europe">
                             <option value="United Kingdom">United Kingdom</option>
                             <option value="Germany">Germany</option>
@@ -230,6 +227,7 @@
                             <option value="Canada">Canada</option>
                             <option value="Australia">Australia</option>
                             <option value="Other">Other</option>
+                        </optgroup>
                     </select>
                 </div>
             </div>
@@ -281,13 +279,12 @@
             </div>
         </div>
 
-        <button id="paystack-trigger" class="btn-gold">Pay ₦14,000 via Paystack</button>
+        <button id="proceed-to-payment" class="btn-gold">Proceed to Payment</button>
         <button onclick="location.reload()" class="w-full text-gray-500 text-xs mt-4 underline">Edit Info</button>
     </div>
 </div>
 
 <script>
-const PAYSTACK_PUBLIC_KEY = "pk_live_2c97661633583cdacd996efd6d64cc1a06565a84";
 let formData = {};
 
 function togglePass(id, icon) {
@@ -330,30 +327,17 @@ document.getElementById('glamour-reg-form').addEventListener('submit', function(
     document.getElementById('step-2').classList.remove('hidden');
 });
 
-document.getElementById('paystack-trigger').addEventListener('click', function () {
-    const handler = PaystackPop.setup({
-        key: PAYSTACK_PUBLIC_KEY,
+// NEW REDIRECT LOGIC
+document.getElementById('proceed-to-payment').addEventListener('click', function () {
+    const queryParams = new URLSearchParams({
+        name: formData.name,
+        username: formData.user,
         email: formData.email,
-        amount: 14000 * 100, // Amount in kobo
-        currency: "NGN",
-        ref: "GLAMOUR-" + Math.floor((Math.random() * 1e15) + 1),
-        callback: function (response) {
-            const msg = 
-                `👑 *GLAMOUR REGISTRATION*%0A` +
-                `👤 Name: ${formData.name}%0A` +
-                `🆔 User: ${formData.user}%0A` +
-                `📞 Phone: ${formData.phone}%0A` +
-                `📍 Location: ${formData.location}%0A` +
-                `💰 Status: PAID 14,000 NGN%0A` +
-                `🧾 Ref: ${response.reference}`;
+        phone: formData.phone
+    }).toString();
 
-            window.location.href = `https://t.me/Glamourerouagent?text=${msg}`;
-        },
-        onClose: function () {
-            console.log("Transaction cancelled");
-        }
-    });
-    handler.openIframe();
+    // Redirect to your payment.html with the data
+    window.location.href = `payment.html?${queryParams}`;
 });
 </script>
 

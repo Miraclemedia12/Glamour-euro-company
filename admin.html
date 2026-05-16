@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glamour Admin | Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+        
+        :root { 
+            --gold: #d4af37; 
+            --dark: #080808; 
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        body { 
+            background-color: var(--dark); 
+            color: #fff; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            overflow-x: hidden;
+        }
+
+        /* Login Overlay */
+        #auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--dark);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #080808 100%);
+        }
+
+        .admin-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 24px;
+        }
+
+        .input-field {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            border-radius: 12px;
+            padding: 14px;
+            width: 100%;
+            color: white;
+            transition: 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: var(--gold);
+            outline: none;
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            color: black;
+            font-weight: 800;
+            padding: 14px;
+            border-radius: 12px;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2); }
+
+        .sidebar-item {
+            padding: 12px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255,255,255,0.5);
+            transition: 0.3s;
+        }
+
+        .sidebar-item.active { background: rgba(212, 175, 55, 0.1); color: var(--gold); }
+    </style>
+</head>
+<body class="flex">
+
+    <div id="auth-overlay">
+        <div class="admin-card p-10 w-full max-w-md text-center">
+            <h1 class="text-2xl font-black text-[#d4af37] tracking-[0.3em] mb-2 uppercase">Command Center</h1>
+            <p class="text-white/40 text-xs mb-8 uppercase font-bold">Authorized Personnel Only</p>
+            
+            <form id="login-form" class="space-y-4 text-left">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-white/30 ml-2">Email</label>
+                    <input type="email" id="login-email" class="input-field" placeholder="admin@glamour.com" required>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-white/30 ml-2">Password</label>
+                    <input type="password" id="login-pass" class="input-field" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary mt-4">Access Dashboard</button>
+            </form>
+            <p id="login-error" class="text-red-500 text-xs mt-4 hidden">Invalid credentials. Access Denied.</p>
+        </div>
+    </div>
+
+    <aside class="w-64 min-h-screen border-r border-white/10 p-6 hidden lg:block">
+        <div class="mb-10">
+            <h2 class="text-lg font-black text-[#d4af37] tracking-widest">GLAMOUR</h2>
+        </div>
+        <nav class="space-y-2">
+            <a href="#" class="sidebar-item active"><i class="fas fa-home"></i> Home</a>
+            <a href="#" class="sidebar-item"><i class="fas fa-users"></i> Users</a>
+            <a href="#" class="sidebar-item"><i class="fas fa-cog"></i> Settings</a>
+            <button id="logout-btn" class="sidebar-item w-full text-left text-red-400 mt-10 hover:bg-red-400/10"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </nav>
+    </aside>
+
+    <main class="flex-1 p-6 lg:p-12">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h2 class="text-2xl font-black italic">CONTROL PANEL</h2>
+                <p class="text-white/40 text-xs uppercase font-bold tracking-widest">Global Configuration</p>
+            </div>
+            <div class="h-10 w-10 rounded-full border border-[#d4af37] flex items-center justify-center text-[#d4af37]">
+                <i class="fas fa-user-shield"></i>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="admin-card p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <i class="fas fa-university text-[#d4af37]"></i>
+                    <h3 class="font-black uppercase tracking-tight">Payment Details</h3>
+                </div>
+                
+                <form id="db-update-form" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] font-black text-white/30 uppercase mb-2 block">Bank Name</label>
+                            <input type="text" id="db-bank" class="input-field" placeholder="Kuda MFB">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-white/30 uppercase mb-2 block">Activation Fee</label>
+                            <input type="text" id="db-amt" class="input-field" placeholder="₦14,000">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black text-white/30 uppercase mb-2 block">Account Number</label>
+                        <input type="text" id="db-num" class="input-field" placeholder="3003773218">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black text-white/30 uppercase mb-2 block">Account Name</label>
+                        <input type="text" id="db-name" class="input-field" placeholder="Miracle Media Entertainment">
+                    </div>
+                    <button type="submit" id="save-btn" class="btn-primary mt-4">Push Update to Site</button>
+                </form>
+            </div>
+
+            <div class="space-y-6">
+                <div class="admin-card p-6 border-l-4 border-[#d4af37]">
+                    <p class="text-white/40 text-[10px] font-black uppercase">Database Status</p>
+                    <div class="flex items-center gap-2 text-green-400 font-bold mt-1">
+                        <span class="h-2 w-2 rounded-full bg-green-400 animate-pulse"></span> Connected to Firestore
+                    </div>
+                </div>
+                
+                <div class="admin-card p-6">
+                    <h4 class="text-xs font-black uppercase mb-4 text-white/30 italic">Live Preview</h4>
+                    <div class="bg-black/40 rounded-xl p-4 border border-white/5">
+                        <p class="text-[11px] text-white/60 mb-2">How it looks on checkout:</p>
+                        <div class="text-sm font-bold text-[#d4af37]" id="preview-bank">Bank Name</div>
+                        <div class="text-xl font-black" id="preview-num">0000000000</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAFZYiKkkXjMWs1cGKyeb8j9fS0agk1WEg",
+            authDomain: "tkerry-df1a5.firebaseapp.com",
+            projectId: "tkerry-df1a5",
+            storageBucket: "tkerry-df1a5.firebasestorage.app",
+            messagingSenderId: "174040773129",
+            appId: "1:174040773129:web:d33b3f7502ab6f47003ed8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // --- AUTHENTICATION LOGIC ---
+        const overlay = document.getElementById('auth-overlay');
+        const loginForm = document.getElementById('login-form');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                overlay.style.display = 'none';
+                loadCurrentConfig();
+            } else {
+                overlay.style.display = 'flex';
+            }
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            const errorP = document.getElementById('login-error');
+
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (error) {
+                errorP.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+
+        // --- DATABASE LOGIC ---
+        async function loadCurrentConfig() {
+            onSnapshot(doc(db, "configs", "main"), (doc) => {
+                if (doc.exists()) {
+                    const data = doc.data().nigeria;
+                    document.getElementById('db-bank').value = data.bank;
+                    document.getElementById('db-num').value = data.num;
+                    document.getElementById('db-name').value = data.name;
+                    document.getElementById('db-amt').value = data.amt;
+                    
+                    // Update Preview
+                    document.getElementById('preview-bank').innerText = data.bank;
+                    document.getElementById('preview-num').innerText = data.num;
+                }
+            });
+        }
+
+        document.getElementById('db-update-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('save-btn');
+            btn.innerText = "PUSHING DATA...";
+            btn.disabled = true;
+
+            const update = {
+                nigeria: {
+                    bank: document.getElementById('db-bank').value,
+                    num: document.getElementById('db-num').value,
+                    name: document.getElementById('db-name').value,
+                    amt: document.getElementById('db-amt').value
+                }
+            };
+
+            try {
+                await setDoc(doc(db, "configs", "main"), update, { merge: true });
+                alert("Site configuration updated successfully!");
+            } catch (err) {
+                console.error(err);
+                alert("Error: " + err.message);
+            } finally {
+                btn.innerText = "Push Update to Site";
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

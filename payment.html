@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Glamour Activation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+        
+        :root { 
+            --glamour-gold: #d4af37; 
+            --glamour-dark: #0a0a0a; 
+        }
+
+        body {
+            background-color: var(--glamour-dark);
+            background-image: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+            color: #fff; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .premium-card { 
+            background: rgba(255, 255, 255, 0.02); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(212, 175, 55, 0.3); 
+            border-radius: 32px; 
+            padding: 40px 24px; 
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
+        }
+
+        .timer-badge { 
+            background: rgba(255, 75, 75, 0.1); 
+            border: 1px solid rgba(255, 75, 75, 0.2); 
+            color: #ff6b6b; 
+            padding: 6px 14px; 
+            border-radius: 100px; 
+            font-weight: 700; 
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .amount-box { 
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); 
+            border-radius: 24px; 
+            padding: 25px; 
+            text-align: center; 
+            margin: 25px 0; 
+            border: 1px solid rgba(212, 175, 55, 0.2); 
+        }
+
+        .bank-details-wrapper { 
+            background: rgba(255,255,255,0.03); 
+            border: 1px dashed rgba(212, 175, 55, 0.4); 
+            border-radius: 24px; 
+            padding: 24px; 
+            margin: 25px 0; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+
+        .account-number-text { 
+            font-size: 32px; 
+            font-weight: 800; 
+            letter-spacing: 2px; 
+            color: var(--glamour-gold); 
+        }
+
+        .btn-main { 
+            background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); 
+            color: #000; 
+            width: 100%; 
+            padding: 20px; 
+            border-radius: 20px; 
+            font-weight: 800; 
+            font-size: 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px; 
+            transition: all 0.3s; 
+            text-transform: uppercase; 
+            border: none; 
+            cursor: pointer; 
+        }
+
+        .glamour-toast { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); 
+            background: #111; border: 1px solid var(--glamour-gold); padding: 12px 24px; 
+            border-radius: 15px; display: flex; align-items: center; gap: 10px; transition: 0.5s; opacity: 0; z-index: 10001; 
+        }
+
+        .glamour-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    </style>
+</head>
+<body>
+
+<div id="copy-toast" class="glamour-toast">
+    <i class="fas fa-check-circle text-[#d4af37]"></i>
+    <span class="text-xs font-bold tracking-widest uppercase">Copied to Clipboard</span>
+</div>
+
+<div class="premium-card">
+    <div class="text-center">
+        <h1 class="text-xs font-black text-[#d4af37] tracking-[0.4em] uppercase mb-4">Glamour Ecosystem</h1>
+        <div class="timer-badge">
+            <i class="fas fa-bolt"></i> 
+            SESSION EXPIRES IN: <span id="timer" class="font-mono ml-1">10:00</span>
+        </div>
+        <h2 class="text-2xl font-black mt-8 mb-2 uppercase italic tracking-tight">Secure Activation</h2>
+        <p class="text-white/40 text-[11px] leading-relaxed px-6">
+            Make a transfer of exactly <span class="text-white font-bold">₦14,000</span> to the verified company account below.
+        </p>
+    </div>
+
+    <div class="amount-box">
+        <span class="text-[10px] text-white/40 uppercase font-black tracking-widest block mb-1">Total Payable</span>
+        <div class="text-3xl font-black">₦14,000</div>
+    </div>
+
+    <div class="bank-details-wrapper text-center" onclick="copyAccountNumber()">
+        <div class="flex justify-center items-center gap-2 text-[#d4af37] text-[10px] font-black uppercase mb-4">
+            <i class="fas fa-badge-check"></i> Official Merchant Account
+        </div>
+        
+        <div class="mb-4">
+            <p class="text-[9px] text-white/30 uppercase font-black mb-1">Bank Name</p>
+            <p class="text-lg font-bold">KUDA MFB</p>
+        </div>
+
+        <div class="mb-4">
+            <p class="text-[9px] text-white/30 uppercase font-black mb-1">Account Number</p>
+            <p id="acc-num" class="account-number-text">3003773218</p>
+            <span class="text-[8px] bg-white/10 text-white/50 px-3 py-1 rounded-full font-black uppercase">Tap to copy</span>
+        </div>
+
+        <div>
+            <p class="text-[9px] text-white/30 uppercase font-black mb-1">Account Name</p>
+            <p class="text-[12px] font-bold uppercase text-white/80 tracking-wide">
+                Miracle Media Entertainment - Glamour company
+            </p>
+        </div>
+    </div>
+
+    <button onclick="redirectToTelegram()" class="btn-main">
+        I've Sent the ₦14,000 <i class="fas fa-chevron-right text-xs"></i>
+    </button>
+</div>
+
+<script>
+    // 1. DYNAMIC DATA CAPTURE
+    const urlParams = new URLSearchParams(window.location.search);
+    const userData = {
+        name: urlParams.get('name') || "Customer",
+        email: urlParams.get('email') || "Not provided",
+        phone: urlParams.get('phone') || "Not provided",
+        username: urlParams.get('username') || "Not provided"
+    };
+
+    // 2. TIMER LOGIC
+    function startTimer(duration, display) {
+        let timer = duration, minutes, seconds;
+        setInterval(function () {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+            display.textContent = minutes + ":" + seconds;
+            if (--timer < 0) timer = 0;
+        }, 1000);
+    }
+
+    window.onload = function () {
+        startTimer(60 * 10, document.querySelector('#timer'));
+    };
+
+    // 3. COPY FUNCTION
+    function copyAccountNumber() {
+        const num = document.getElementById('acc-num').innerText;
+        navigator.clipboard.writeText(num).then(() => {
+            const toast = document.getElementById('copy-toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        });
+    }
+
+    // 4. TELEGRAM REDIRECT WITH USER DETAILS
+    function redirectToTelegram() {
+        const message = encodeURIComponent(
+            `👑 *NEW GLAMOUR ACTIVATION ALERT*\n\n` +
+            `👤 *Name:* ${userData.name}\n` +
+            `🆔 *Username:* ${userData.username}\n` +
+            `📧 *Email:* ${userData.email}\n` +
+            `📞 *Phone:* ${userData.phone}\n\n` +
+            `💰 *Payment Status:* SENT (₦14,000)\n` +
+            `🏦 *Target Bank:* KUDA MFB\n\n` +
+            `Please verify my receipt and activate my account.`
+        );
+
+        window.location.href = `https://t.me/Glamourerouagent?text=${message}`;
+    }
+</script>
+
+</body>
+</html>
